@@ -218,7 +218,7 @@ def SIGN_STREAM(stream_url, stream_name, stream_icon):
     elif MSO_ID == 'TWC':
         provider = TWC()
     elif MSO_ID == 'Comcast_SSO':
-        provider = COMCAST()
+        provider = COMCAST(REQUESTOR_ID)
     elif MSO_ID == 'DTV':
         provider = DIRECT_TV()
     elif MSO_ID == 'Charter_Direct':
@@ -241,7 +241,7 @@ def SIGN_STREAM(stream_url, stream_name, stream_icon):
     if provider != None:
         #stream_url = AUTHORIZE_STREAM(provider)
         
-        adobe = ADOBE()
+        adobe = ADOBE(REQUESTOR_ID)
         expired_cookies = True
         try:
             cj = cookielib.LWPCookieJar()

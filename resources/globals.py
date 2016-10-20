@@ -14,6 +14,12 @@ import gzip
 from datetime import datetime, timedelta
 
 
+REQUESTOR_ID = 'nbcentertainment'
+# http://stream.nbcsports.com/data/mobile/Requestor_ID_Lookup_doc.csv
+REQUESTORS = {
+    'nbcentertainment': 'ksunsXjr6uB9EnT44k0MW02lL/VoFc/kBolROTzgHLR6gHB2NpgX9M0T31GDxO1OQEGi3+DAGuIMis3YrM+8uq5llSicSxQ3v1SNxOVAsqPrlzf9AfaNjLIbs15HDSZDWQ86hcvL4KeuPuHlF1gGI/M7l0AdcZsykh/geb0sfM0R7S0vyX06xjwapt00ajAu7h7WcI0vvTLDb6iZudjkisAX2EahlRINSSS44twK918QvVrci8pedF6utqLEi8VLcuwD/fnCAdLbPIkLQAedEvq1jmBYqKf1Tll3YiKtXLK7o1N6wymwhTFh95L+tZuOaDypMVGPKv1xYjJ+AT/Pzg==',
+}
+
 def stringToDate(string, date_format):
     try:
         date = datetime.strptime(str(string), date_format)
@@ -31,7 +37,7 @@ def FIND(source,start_str,end_str):
     else:
         return ''
 
-def GET_RESOURCE_ID():
+def GET_RESOURCE_ID(requestor_id=None):
     #########################
     # Get resource_id
     #########################
@@ -45,17 +51,18 @@ def GET_RESOURCE_ID():
     Accept-Encoding: gzip, deflate
     Connect
     """
+    if not requestor_id: requestor_id = REQUESTOR_ID
     #req = urllib2.Request(ROOT_URL+'passnbc.xml')  
     #req.add_header('User-Agent',  UA_NBCSN)
     #response = urllib2.urlopen(req)        
     #resource_id = response.read()
     #response.close() 
     #resource_id = resource_id.replace('\n', ' ').replace('\r', '')
-    resource_id = '<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title>nbcsports</title><item><title>NBC Sports PGA Event</title><guid>123456789</guid><media:rating scheme="urn:vchip">TV-PG</media:rating></item></channel></rss>'
+    resource_id = '<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title>'+requestor_id+'</title><item><title>NBC Sports PGA Event</title><guid>123456789</guid><media:rating scheme="urn:vchip">TV-PG</media:rating></item></channel></rss>'
 
     return resource_id
 
-def GET_SIGNED_REQUESTOR_ID():
+def GET_SIGNED_REQUESTOR_ID(requestor_id=None):
 
     ##################################################
     # Use this call to get Adobe's Signed ID
@@ -71,6 +78,10 @@ def GET_SIGNED_REQUESTOR_ID():
     Accept-Encoding: gzip, deflate
     Connection: keep-alive
     """
+    if not requestor_id: requestor_id = REQUESTOR_ID
+    
+    if requestor_id in REQUESTORS: return REQUESTORS[requestor_id]
+
     req = urllib2.Request(ROOT_URL+'apps/NBCSports/configuration-ios.json')  
     req.add_header('User-Agent',  UA_NBCSN)
     response = urllib2.urlopen(req)        
@@ -83,7 +94,17 @@ def GET_SIGNED_REQUESTOR_ID():
     signed_requestor_id = signed_requestor_id.replace('\n',"")
     print signed_requestor_id
     
-    return signed_requestor_id
+    REQUESTORS[json_source['adobePassRequestorId']] = signed_requestor_id
+    if requestor_id not in REQUESTORS:
+        lookup_url = json_source['requestorIDLookup']
+        req = urllib2.Request(lookup_url)
+        req.add_header('User-Agent',  UA_NBCSN)
+        response = urllib2.urlopen(req)
+        import csv
+        cr = csv.DictReader(response)
+        for row in cr:
+            REQUESTORS[row['requestorID']] = row['Signed Requestor ID']
+    return REQUESTORS[requestor_id]
 
 def SET_STREAM_QUALITY(url):
     xbmc.log(url)
@@ -368,7 +389,7 @@ elif PROVIDER == 'Bright House':
 elif PROVIDER == 'Frontier':
     MSO_ID = 'FRONTIER'
 
-IDP_URL = 'https://sp.auth.adobe.com/adobe-services/authenticate/saml?domain_name=adobe.com&noflash=true&mso_id='+MSO_ID+'&requestor_id=nbcsports&no_iframe=true&client_type=iOS&client_version=1.10.1&redirect_url=http://adobepass.ios.app/'
+IDP_URL = 'https://sp.auth.adobe.com/adobe-services/authenticate/saml?domain_name=adobe.com&noflash=true&mso_id='+MSO_ID+'&requestor_id='+REQUESTOR_ID+'&no_iframe=true&client_type=iOS&client_version=1.10.1&redirect_url=http://adobepass.ios.app/'
 ORIGIN = ''
 REFERER = ''
 

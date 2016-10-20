@@ -2,6 +2,8 @@ from resources.globals import *
 
 
 class ADOBE():    
+    def __init__(self, requestor_id='nbcsports'):
+        self.requestor_id = requestor_id
 
     def GET_IDP(self):
         if not os.path.exists(ADDON_PATH_PROFILE):
@@ -27,7 +29,7 @@ class ADOBE():
         idp_source = idp_source.replace('\n',"")        
 
         saml_request = FIND(idp_source,'<input type="hidden" name="SAMLRequest" value="','"')
-        #print saml_request
+        print saml_request
 
         relay_state = FIND(idp_source,'<input type="hidden" name="RelayState" value="','"')
 
@@ -109,7 +111,7 @@ class ADOBE():
                     "Cookie": cookies,
                     "User-Agent": UA_ADOBE_PASS}
         
-        data = urllib.urlencode({'requestor_id' : 'nbcsports',
+        data = urllib.urlencode({'requestor_id' : self.requestor_id,
                                  '_method' : 'GET',
                                  'signed_requestor_id' : signed_requestor_id,
                                  'device_id' : DEVICE_ID
@@ -167,7 +169,7 @@ class ADOBE():
                     "Connection": "keep-alive",                                                                
                     "User-Agent": UA_ADOBE_PASS}
 
-        data = urllib.urlencode({'requestor_id' : 'nbcsports',
+        data = urllib.urlencode({'requestor_id' : self.requestor_id,
                                  'resource_id' : resource_id,
                                  'signed_requestor_id' : signed_requestor_id,
                                  'mso_id' : MSO_ID,
@@ -242,7 +244,7 @@ class ADOBE():
                             ("User-Agent", UA_ADOBE_PASS)]
         
 
-        data = urllib.urlencode({'requestor_id' : 'nbcsports',                             
+        data = urllib.urlencode({'requestor_id' : self.requestor_id,                             
                                  'signed_requestor_id' : signed_requestor_id,
                                  'mso_id' : MSO_ID,
                                  'session_guid' : session_guid,
