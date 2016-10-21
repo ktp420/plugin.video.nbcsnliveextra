@@ -363,6 +363,21 @@ PLAY_BEST = str(settings.getSetting(id="play_best"))
 if CLEAR == 'true':
    CLEAR_SAVED_DATA()
 
+provider_dictionary = { "Bright House" : "Brighthouse",
+                        "Cable One" : "auth_cableone_net",
+                        "Charter" : "Charter_Direct",
+                        "Comcast (xfinity)" : "Comcast_SSO",
+                        "Cox" : "Cox",
+                        "Dish Network" : "Dish",
+                        "Direct TV" : "DTV",
+                        "Frontier" : "FRONTIER",    
+                        "Optimum" : "Cablevision",
+                        "Playstation Vue" : "sony_auth-gateway_net",
+                        "Time Warner Cable" : "TWC",
+                        "Verizon" : "Verizon"
+                    }
+
+'''
 print 'PROVIDER!!!'
 print PROVIDER
 MSO_ID = ''
@@ -380,6 +395,8 @@ elif PROVIDER == 'Direct TV':
     MSO_ID = 'DTV'    
 elif PROVIDER == 'Optimum':
     MSO_ID = 'Cablevision'
+elif PROVIDER == 'Playstation Vue':
+    MSO_ID = 'sony_auth-gateway_net'
 elif PROVIDER == 'Time Warner Cable':
     MSO_ID = 'TWC'
 elif PROVIDER == 'Verizon':
@@ -388,7 +405,9 @@ elif PROVIDER == 'Bright House':
     MSO_ID = 'Brighthouse'
 elif PROVIDER == 'Frontier':
     MSO_ID = 'FRONTIER'
+'''
 
+MSO_ID = provider_dictionary[PROVIDER]
 IDP_URL = 'https://sp.auth.adobe.com/adobe-services/authenticate/saml?domain_name=adobe.com&noflash=true&mso_id='+MSO_ID+'&requestor_id='+REQUESTOR_ID+'&no_iframe=true&client_type=iOS&client_version=1.10.1&redirect_url=http://adobepass.ios.app/'
 ORIGIN = ''
 REFERER = ''
