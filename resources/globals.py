@@ -204,11 +204,15 @@ def SET_STREAM_QUALITY(url):
     
     if len(stream_title) > 0:
         ret =-1      
-        stream_title.sort(key=natural_sort_key)  
+        stream_title.sort(key=natural_sort_key, reverse=True)
         print "PLAY BEST SETTING"
         print PLAY_BEST
         if str(PLAY_BEST) == 'true':
-            ret = len(stream_title)-1            
+            ret = 0
+            try:
+                ret += 2 if stream_title[ret] == stream_title[ret+1] else 1
+            except:
+                pass
         else:
             dialog = xbmcgui.Dialog() 
             ret = dialog.select('Choose Stream Quality', stream_title)
