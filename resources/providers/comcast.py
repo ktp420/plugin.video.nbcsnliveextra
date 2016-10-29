@@ -101,7 +101,9 @@ class COMCAST():
             resp.close()
             
             auth_url = FIND(response, 'window.location = "', '"')
-            xbmc.log(auth_url)
+            if not auth_url:
+                auth_url = FIND(response, 'continue: "', '"')
+            xbmc.log('Auth_URL: ' + str(auth_url))
             time.sleep(3)
             resp = opener.open(auth_url)
             xbmc.log(str(resp.getcode()))
