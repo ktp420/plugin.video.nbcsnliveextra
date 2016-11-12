@@ -42,7 +42,7 @@ class COMCAST():
         req_id = FIND(resp.geturl(),'reqId=','&')        
         relay_state = ''
         not_used = ''
-	xbmc.log('ReqId={0} last_url={1}'.format(req_id, last_url))
+        xbmc.log('ReqId={0} last_url={1}'.format(req_id, last_url))
                
         return req_id, last_url, not_used
 
@@ -80,7 +80,7 @@ class COMCAST():
         login_data = urllib.urlencode({'user' : USERNAME,
                                        'passwd' : PASSWORD,
                                        'reqId' : req_id,                                       
-                                       'ipAddrAuthn':'true',
+                                       'ipAddrAuthn':'false',
                                        'deviceAuthn':'false',
                                        's':'oauth',
                                        'forceAuthn':'0',
@@ -94,17 +94,23 @@ class COMCAST():
         saml_response = "skip"
         relay_state = "skip"
         try:
+            # ipAddrAuth = true
             resp = opener.open(referer) #url, login_data)
             xbmc.log(str(resp.getcode()))
-            xbmc.log(str(resp.info()))        
+            xbmc.log(str(resp.geturl()))
+            if url in resp.geturl():
+                # if still on login, do form based login
+                resp = opener.open(referer, login_data) #url, login_data)
+                xbmc.log(str(resp.getcode()))
+                xbmc.log(str(resp.geturl()))
             response = resp.read() 
             resp.close()
             
-            auth_url = FIND(response, 'window.location = "', '"')
-            if not auth_url:
-                auth_url = FIND(response, 'continue: "', '"')
+            auth_url = FIND(response, 'continue: "', '"')
+            if not auth_url: auth_url = FIND(response, 'window.location = "', '"')
+            if not auth_url: auth_url = FIND(response, 'window.location="', '"')
             xbmc.log('Auth_URL: ' + str(auth_url))
-            time.sleep(3)
+            time.sleep(1.5)
             resp = opener.open(auth_url)
             xbmc.log(str(resp.getcode()))
             xbmc.log(str(resp.info()))
