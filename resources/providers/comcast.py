@@ -98,11 +98,6 @@ class COMCAST():
             resp = opener.open(referer) #url, login_data)
             xbmc.log(str(resp.getcode()))
             xbmc.log(str(resp.geturl()))
-            if url in resp.geturl():
-                # if still on login, do form based login
-                resp = opener.open(referer, login_data) #url, login_data)
-                xbmc.log(str(resp.getcode()))
-                xbmc.log(str(resp.geturl()))
             response = resp.read() 
             resp.close()
             
@@ -110,6 +105,12 @@ class COMCAST():
             if not auth_url: auth_url = FIND(response, 'window.location = "', '"')
             if not auth_url: auth_url = FIND(response, 'window.location="', '"')
             xbmc.log('Auth_URL: ' + str(auth_url))
+            if not auth_url:
+                xbmc.log(str(response))
+                # if still on login, do form based login
+                resp = opener.open(url, login_data) #url, login_data)
+                xbmc.log(str(resp.getcode()))
+                xbmc.log(str(resp.geturl()))
             time.sleep(1.5)
             resp = opener.open(auth_url)
             xbmc.log(str(resp.getcode()))
