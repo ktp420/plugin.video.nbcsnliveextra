@@ -4,7 +4,7 @@ import sys
 import xbmc, xbmcplugin, xbmcgui, xbmcaddon
 import json
 import string, random
-import urllib, urllib2, httplib2
+import urllib, urllib2
 import HTMLParser
 import time
 import cookielib
@@ -19,6 +19,13 @@ REQUESTOR_ID = 'nbcentertainment'
 REQUESTORS = {
     'nbcentertainment': 'ksunsXjr6uB9EnT44k0MW02lL/VoFc/kBolROTzgHLR6gHB2NpgX9M0T31GDxO1OQEGi3+DAGuIMis3YrM+8uq5llSicSxQ3v1SNxOVAsqPrlzf9AfaNjLIbs15HDSZDWQ86hcvL4KeuPuHlF1gGI/M7l0AdcZsykh/geb0sfM0R7S0vyX06xjwapt00ajAu7h7WcI0vvTLDb6iZudjkisAX2EahlRINSSS44twK918QvVrci8pedF6utqLEi8VLcuwD/fnCAdLbPIkLQAedEvq1jmBYqKf1Tll3YiKtXLK7o1N6wymwhTFh95L+tZuOaDypMVGPKv1xYjJ+AT/Pzg==',
 }
+
+DISABLE_LOG=True
+
+def log(*args):
+    if DISABLE_LOG: return
+    for s in args:
+        if s: xbmc.log('{0}'.format(s), xbmc.LOGNOTICE)
 
 def stringToDate(string, date_format):
     try:
@@ -204,11 +211,15 @@ def SET_STREAM_QUALITY(url):
     
     if len(stream_title) > 0:
         ret =-1      
-        stream_title.sort(key=natural_sort_key)  
+        stream_title.sort(key=natural_sort_key, reverse=True)
         print "PLAY BEST SETTING"
         print PLAY_BEST
         if str(PLAY_BEST) == 'true':
-            ret = len(stream_title)-1            
+            ret = 0
+            try:
+                ret += 2 if stream_title[ret] == stream_title[ret+1] else 1
+            except:
+                pass
         else:
             dialog = xbmcgui.Dialog() 
             ret = dialog.select('Choose Stream Quality', stream_title)
