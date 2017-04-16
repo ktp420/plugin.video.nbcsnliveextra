@@ -20,7 +20,10 @@ REQUESTORS = {
     'nbcentertainment': 'ksunsXjr6uB9EnT44k0MW02lL/VoFc/kBolROTzgHLR6gHB2NpgX9M0T31GDxO1OQEGi3+DAGuIMis3YrM+8uq5llSicSxQ3v1SNxOVAsqPrlzf9AfaNjLIbs15HDSZDWQ86hcvL4KeuPuHlF1gGI/M7l0AdcZsykh/geb0sfM0R7S0vyX06xjwapt00ajAu7h7WcI0vvTLDb6iZudjkisAX2EahlRINSSS44twK918QvVrci8pedF6utqLEi8VLcuwD/fnCAdLbPIkLQAedEvq1jmBYqKf1Tll3YiKtXLK7o1N6wymwhTFh95L+tZuOaDypMVGPKv1xYjJ+AT/Pzg==',
 }
 
+DISABLE_LOG=True
+
 def log(*args):
+    if DISABLE_LOG: return
     for s in args:
         if s: xbmc.log('{0}'.format(s), xbmc.LOGNOTICE)
 

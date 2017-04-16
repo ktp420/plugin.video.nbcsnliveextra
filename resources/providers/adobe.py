@@ -52,7 +52,6 @@ class ADOBE():
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
         opener.addheaders = [("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
-                            ("Accept-Encoding", "gzip, deflate"),
                             ("Accept-Language", "en-us"),
                             ("Content-Type", "application/x-www-form-urlencoded"),
                             #("Proxy-Connection", "keep-alive"),
@@ -91,7 +90,6 @@ class ADOBE():
 
         url = 'https://sp.auth.adobe.com//adobe-services/1.0/sessionDevice'        
         opener.addheaders = [ ("Accept", "*/*"),
-                    ("Accept-Encoding", "gzip, deflate"),
                     ("Accept-Language", "en-us"),
                     ("Content-Type", "application/x-www-form-urlencoded"),
                     ("Proxy-Connection", "keep-alive"),
@@ -116,7 +114,7 @@ class ADOBE():
         
         log(str(response.getcode()))
         log(str(response.info()))
-        log(list(content))
+        log(content)
         log('-------------------------------------------------------------------------------')
         
         auth_token = FIND(content,'<authnToken>','</authnToken>')
@@ -156,7 +154,6 @@ class ADOBE():
 
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         opener.addheaders = [ ("Accept", "*/*"),
-                            ("Accept-Encoding", "gzip, deflate"),
                             ("Accept-Language", "en-us"),
                             ("Content-Type", "application/x-www-form-urlencoded"),
                             ("Proxy-Connection", "keep-alive"),
@@ -211,7 +208,6 @@ class ADOBE():
         cj.load(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'),ignore_discard=True)
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         opener.addheaders = [ ("Accept", "*/*"),
-                            ("Accept-Encoding", "gzip, deflate"),
                             ("Accept-Language", "en-us"),
                             ("Content-Type", "application/x-www-form-urlencoded"),
                             ("Proxy-Connection", "keep-alive"),
@@ -247,7 +243,6 @@ class ADOBE():
         url = 'http://sp.auth.adobe.com//tvs/v1/sign'
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         opener.addheaders = [ ("Accept", "*/*"),
-                            ("Accept-Encoding", "gzip, deflate"),
                             ("Accept-Language", "en;q=1"),
                             ("Content-Type", "application/x-www-form-urlencoded"),                                                                                         
                             ("Cookie", cookies),
