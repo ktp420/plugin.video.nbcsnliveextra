@@ -1,7 +1,7 @@
 import sys
 import xbmc, xbmcplugin, xbmcgui, xbmcaddon
 import re, os, time
-import urllib, urllib2
+import urllib, urllib2, httplib2
 import json
 import HTMLParser
 import cookielib
@@ -42,7 +42,7 @@ class COMCAST():
         req_id = FIND(resp.geturl(),'reqId=','&')        
         relay_state = ''
         not_used = ''
-        xbmc.log('ReqId={0} last_url={1}'.format(req_id, last_url))
+	xbmc.log('ReqId={0} last_url={1}'.format(req_id, last_url))
                
         return req_id, last_url, not_used
 
@@ -80,7 +80,7 @@ class COMCAST():
         login_data = urllib.urlencode({'user' : USERNAME,
                                        'passwd' : PASSWORD,
                                        'reqId' : req_id,                                       
-                                       'ipAddrAuthn':'false',
+                                       'ipAddrAuthn':'true',
                                        'deviceAuthn':'false',
                                        's':'oauth',
                                        'forceAuthn':'0',
@@ -94,24 +94,15 @@ class COMCAST():
         saml_response = "skip"
         relay_state = "skip"
         try:
-            # ipAddrAuth = true
             resp = opener.open(referer) #url, login_data)
             xbmc.log(str(resp.getcode()))
-            xbmc.log(str(resp.geturl()))
+            xbmc.log(str(resp.info()))        
             response = resp.read() 
             resp.close()
             
-            auth_url = FIND(response, 'continue: "', '"')
-            if not auth_url: auth_url = FIND(response, 'window.location = "', '"')
-            if not auth_url: auth_url = FIND(response, 'window.location="', '"')
-            xbmc.log('Auth_URL: ' + str(auth_url))
-            if not auth_url:
-                xbmc.log(str(response))
-                # if still on login, do form based login
-                resp = opener.open(url, login_data) #url, login_data)
-                xbmc.log(str(resp.getcode()))
-                xbmc.log(str(resp.geturl()))
-            time.sleep(1.5)
+            auth_url = FIND(response, 'window.location = "', '"')
+            xbmc.log(auth_url)
+            time.sleep(3)
             resp = opener.open(auth_url)
             xbmc.log(str(resp.getcode()))
             xbmc.log(str(resp.info()))

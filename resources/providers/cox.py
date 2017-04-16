@@ -1,7 +1,7 @@
 import sys
 import xbmc, xbmcplugin, xbmcgui, xbmcaddon
 import re, os, time
-import urllib, urllib2
+import urllib, urllib2, httplib2
 import json
 import HTMLParser
 import time
