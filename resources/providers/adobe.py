@@ -44,7 +44,6 @@ class ADOBE():
         ###################################################################
         # SAML Assertion Consumer
         ###################################################################        
-        if 'skip' == saml_response: return
         url = 'https://sp.auth.adobe.com/sp/saml/SAMLAssertionConsumer'
         
         cj = cookielib.LWPCookieJar(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'))
@@ -104,16 +103,17 @@ class ADOBE():
                                  'signed_requestor_id' : signed_requestor_id,
                                  'device_id' : DEVICE_ID
                                 })
-        
                 
+        log('POST_SESSION_DEVICE------------------------------------------------------------')
+        log(str(headers))
+        log(str(data))
+
         request = urllib2.Request(url, data)
         response = opener.open(request)
         content = response.read()
         response.close()
         SAVE_COOKIE(cj)
-        log('POST_SESSION_DEVICE------------------------------------------------------------')
-        log(str(headers))
-        log(str(data))
+        
         log(str(response))
         log(str(content))
         log('-------------------------------------------------------------------------------')
