@@ -22,7 +22,7 @@ REQUESTORS = {
 
 def log(*args):
     for s in args:
-        if s: xbmc.log(str(s), xbmc.LOGNOTICE)
+        if s: xbmc.log('{0}'.format(s), xbmc.LOGNOTICE)
 
 def stringToDate(string, date_format):
     try:

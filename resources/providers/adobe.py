@@ -47,6 +47,7 @@ class ADOBE():
         url = 'https://sp.auth.adobe.com/sp/saml/SAMLAssertionConsumer'
         
         cj = cookielib.LWPCookieJar(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'))
+        cj.load(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'),ignore_discard=True)
 
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
@@ -66,16 +67,15 @@ class ADOBE():
                                  'RelayState' : relay_state
                                  })
 
+        log('POST_ASSERTION_CONSUMER_SERVICE------------------------------------------------')
+        log(str(body))
         request = urllib2.Request(url, body)
         response = opener.open(request)
         content = response.read()
         response.close()
         SAVE_COOKIE(cj)
-        log('POST_ASSERTION_CONSUMER_SERVICE------------------------------------------------')
-        log(str(opener.addheaders))
-        log(str(body))
         log(str(response.getcode()))
-        log(str(content))
+        #log(str(content))
         log('-------------------------------------------------------------------------------')
         
     
@@ -85,7 +85,8 @@ class ADOBE():
         # Create a Session for Device
         ###################################################################                
         cj = cookielib.LWPCookieJar(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'))
-
+        cj.load(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'),ignore_discard=True)
+        
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
         url = 'https://sp.auth.adobe.com//adobe-services/1.0/sessionDevice'        
@@ -105,7 +106,6 @@ class ADOBE():
                                 })
                 
         log('POST_SESSION_DEVICE------------------------------------------------------------')
-        log(str(headers))
         log(str(data))
 
         request = urllib2.Request(url, data)
@@ -114,8 +114,9 @@ class ADOBE():
         response.close()
         SAVE_COOKIE(cj)
         
-        log(str(response))
-        log(str(content))
+        log(str(response.getcode()))
+        log(str(response.info()))
+        log(list(content))
         log('-------------------------------------------------------------------------------')
         
         auth_token = FIND(content,'<authnToken>','</authnToken>')
@@ -151,6 +152,7 @@ class ADOBE():
 
         url = 'https://sp.auth.adobe.com//adobe-services/1.0/authorizeDevice'
         cj = cookielib.LWPCookieJar(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'))
+        cj.load(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'),ignore_discard=True)
 
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
         opener.addheaders = [ ("Accept", "*/*"),
@@ -178,16 +180,15 @@ class ADOBE():
         response.close()
         SAVE_COOKIE(cj)
 
-        log(content)        
-        print response
+        #log(content)        
+        log(response)
 
         authz = FIND(content,'<authzToken>','</authzToken>')                
         authz = authz.replace("&lt;", "<")
         authz = authz.replace("&gt;", ">")
         # this has to be last:
         authz = authz.replace("&amp;", "&")
-        print "AUTH Z TOKEN"
-        print authz
+        log("AUTH Z TOKEN", authz)
         
         return authz
 
