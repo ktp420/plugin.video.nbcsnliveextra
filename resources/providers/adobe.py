@@ -44,44 +44,40 @@ class ADOBE():
         ###################################################################
         # SAML Assertion Consumer
         ###################################################################        
+        if 'skip' == saml_response: return
         url = 'https://sp.auth.adobe.com/sp/saml/SAMLAssertionConsumer'
         
-        cj = cookielib.LWPCookieJar()
-        cj.load(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'),ignore_discard=True)
+        cj = cookielib.LWPCookieJar(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'))
 
-        cookies = ''
-        for cookie in cj:            
-            #if (cookie.name == "BIGipServerAdobe_Pass_Prod" or cookie.name == "client_type" or cookie.name == "client_version" or cookie.name == "JSESSIONID" or cookie.name == "redirect_url") and cookie.domain == "sp.auth.adobe.com":
-            if cookie.domain == "sp.auth.adobe.com":
-                cookies = cookies + cookie.name + "=" + cookie.value + "; "
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 
-
-        http = httplib2.Http()
-        http.disable_ssl_certificate_validation=True    
-        headers = {"Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                            "Accept-Encoding": "gzip, deflate",
-                            "Accept-Language": "en-us",
-                            "Content-Type": "application/x-www-form-urlencoded",
-                            #"Proxy-Connection": "keep-alive",
-                            "Connection": "keep-alive",
-                            "Origin": ORIGIN,
-                            "Referer": REFERER,
-                            "Cookie": cookies,
-                            "User-Agent": UA_IPHONE}
+        opener.addheaders = [("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
+                            ("Accept-Encoding", "gzip, deflate"),
+                            ("Accept-Language", "en-us"),
+                            ("Content-Type", "application/x-www-form-urlencoded"),
+                            #("Proxy-Connection", "keep-alive"),
+                            ("Connection", "keep-alive"),
+                            ("Origin", ORIGIN),
+                            ("Referer", REFERER),
+                            #("Cookie", cookies),
+                            ("User-Agent", UA_IPHONE)]
 
 
         body = urllib.urlencode({'SAMLResponse' : saml_response,
                                  'RelayState' : relay_state
                                  })
 
-        
-        response, content = http.request(url, 'POST', headers=headers, body=body)        
-        xbmc.log('POST_ASSERTION_CONSUMER_SERVICE------------------------------------------------')
-        xbmc.log(str(headers))
-        xbmc.log(str(body))
-        xbmc.log(str(response))
-        xbmc.log(str(content))
-        xbmc.log('-------------------------------------------------------------------------------')
+        request = urllib2.Request(url, body)
+        response = opener.open(request)
+        content = response.read()
+        response.close()
+        SAVE_COOKIE(cj)
+        log('POST_ASSERTION_CONSUMER_SERVICE------------------------------------------------')
+        log(str(opener.addheaders))
+        log(str(body))
+        log(str(response.getcode()))
+        log(str(content))
+        log('-------------------------------------------------------------------------------')
         
     
 
@@ -89,27 +85,19 @@ class ADOBE():
         ###################################################################
         # Create a Session for Device
         ###################################################################                
-        cj = cookielib.LWPCookieJar()
-        cj.load(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'),ignore_discard=True)
-        
-        
-        cookies = ''
-        for cookie in cj:            
-            if (cookie.name == "BIGipServerAdobe_Pass_Prod" or cookie.name == "client_type" or cookie.name == "client_version" or cookie.name == "JSESSIONID" or cookie.name == "redirect_url") and cookie.path == "/":
-                cookies = cookies + cookie.name + "=" + cookie.value + "; "
-        
-        
+        cj = cookielib.LWPCookieJar(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'))
+
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+
         url = 'https://sp.auth.adobe.com//adobe-services/1.0/sessionDevice'        
-        http = httplib2.Http()
-        http.disable_ssl_certificate_validation=True    
-        headers = { "Accept": "*/*",
-                    "Accept-Encoding": "gzip, deflate",
-                    "Accept-Language": "en-us",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "Proxy-Connection": "keep-alive",
-                    "Connection": "keep-alive",                                                
-                    "Cookie": cookies,
-                    "User-Agent": UA_ADOBE_PASS}
+        opener.addheaders = [ ("Accept", "*/*"),
+                    ("Accept-Encoding", "gzip, deflate"),
+                    ("Accept-Language", "en-us"),
+                    ("Content-Type", "application/x-www-form-urlencoded"),
+                    ("Proxy-Connection", "keep-alive"),
+                    ("Connection", "keep-alive"),                                                
+                    #("Cookie", cookies),
+                    ("User-Agent", UA_ADOBE_PASS)]
         
         data = urllib.urlencode({'requestor_id' : self.requestor_id,
                                  '_method' : 'GET',
@@ -118,23 +106,26 @@ class ADOBE():
                                 })
         
                 
-        response, content = http.request(url, 'POST', headers=headers, body=data)
-        xbmc.log('POST_SESSION_DEVICE------------------------------------------------------------')
-        xbmc.log(str(headers))
-        xbmc.log(str(data))
-        xbmc.log(str(response))
-        xbmc.log(str(content))
-        xbmc.log('-------------------------------------------------------------------------------')
+        request = urllib2.Request(url, data)
+        response = opener.open(request)
+        content = response.read()
+        response.close()
+        SAVE_COOKIE(cj)
+        log('POST_SESSION_DEVICE------------------------------------------------------------')
+        log(str(headers))
+        log(str(data))
+        log(str(response))
+        log(str(content))
+        log('-------------------------------------------------------------------------------')
         
-        xbmc.log(content)
         auth_token = FIND(content,'<authnToken>','</authnToken>')
-        xbmc.log("AUTH TOKEN")
-        xbmc.log(str(auth_token))
+        log("AUTH TOKEN")
+        log(str(auth_token))
         auth_token = auth_token.replace("&lt;", "<")
         auth_token = auth_token.replace("&gt;", ">")
         # this has to be last:
         auth_token = auth_token.replace("&amp;", "&")
-        xbmc.log(auth_token)
+        log(auth_token)
 
         #Save auth token to file for         
         fname = os.path.join(ADDON_PATH_PROFILE, 'auth.token')
@@ -159,15 +150,17 @@ class ADOBE():
             return ''
 
         url = 'https://sp.auth.adobe.com//adobe-services/1.0/authorizeDevice'
-        http = httplib2.Http()
-        http.disable_ssl_certificate_validation=True    
-        headers = {"Accept": "*/*",
-                    "Accept-Encoding": "gzip, deflate",
-                    "Accept-Language": "en-us",
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "Proxy-Connection": "keep-alive",
-                    "Connection": "keep-alive",                                                                
-                    "User-Agent": UA_ADOBE_PASS}
+        cj = cookielib.LWPCookieJar(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'))
+
+        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+        opener.addheaders = [ ("Accept", "*/*"),
+                            ("Accept-Encoding", "gzip, deflate"),
+                            ("Accept-Language", "en-us"),
+                            ("Content-Type", "application/x-www-form-urlencoded"),
+                            ("Proxy-Connection", "keep-alive"),
+                            ("Connection", "keep-alive"),
+                            #("Cookie", cookies),
+                            ("User-Agent", UA_ADOBE_PASS)]
 
         data = urllib.urlencode({'requestor_id' : self.requestor_id,
                                  'resource_id' : resource_id,
@@ -179,34 +172,15 @@ class ADOBE():
                                 })
         
         print data
-        response, content = http.request(url, 'POST', headers=headers, body=data)
-        
-        print content        
+        request = urllib2.Request(url, data)
+        response = opener.open(request)
+        content = response.read()
+        response.close()
+        SAVE_COOKIE(cj)
+
+        log(content)        
         print response
 
-        try:
-            print "REFRESHED COOKIE"
-            adobe_pass = response['set-cookie']
-            print adobe_pass
-            cj = cookielib.LWPCookieJar(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'))
-            cj.load(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'),ignore_discard=True)
-            #BIGipServerAdobe_Pass_Prod=526669578.20480.0000; expires=Fri, 19-Jun-2015 19:58:42 GMT; path=/
-            value = FIND(adobe_pass,'BIGipServerAdobe_Pass_Prod=',';')
-            expires = FIND(adobe_pass,'expires=',' GMT;')
-            #date_time = '29.08.2011 11:05:02'        
-            #pattern = '%d.%m.%Y %H:%M:%S'
-            #Fri, 19-Jun-2015 19:58:42
-            pattern = '%a, %d-%b-%Y %H:%M:%S'
-            print expires
-            expires_epoch = int(time.mktime(time.strptime(expires, pattern)))
-            print expires_epoch
-            ck = cookielib.Cookie(version=0, name='BIGipServerAdobe_Pass_Prod', value=value, port=None, port_specified=False, domain='sp.auth.adobe.com', domain_specified=True, domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=expires_epoch, discard=True, comment=None, comment_url=None, rest={'HttpOnly': None}, rfc2109=False)
-            cj.set_cookie(ck)
-            #cj.save(os.path.join(ADDON_PATH_PROFILE, 'cookies.lwp'),ignore_discard=True);
-            SAVE_COOKIE(cj)
-
-        except:
-            pass
         authz = FIND(content,'<authzToken>','</authzToken>')                
         authz = authz.replace("&lt;", "<")
         authz = authz.replace("&gt;", ">")
