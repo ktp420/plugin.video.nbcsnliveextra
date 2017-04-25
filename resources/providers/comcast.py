@@ -47,7 +47,7 @@ class COMCAST():
         return req_id, last_url, not_used
 
     
-    def LOGIN(self, req_id, referer, not_used):
+    def LOGIN(self, req_id, referer, not_used, timeout=10):
         ###################################################################
         #Post username and password to idp        
         ###################################################################                       
@@ -95,7 +95,7 @@ class COMCAST():
         relay_state = "skip"
         try:
             # ipAddrAuth = true
-            resp = opener.open(referer) #url, login_data)
+            resp = opener.open(referer, timeout=timeout) #url, login_data)
             xbmc.log(str(resp.getcode()))
             xbmc.log(str(resp.geturl()))
             response = resp.read() 
@@ -108,11 +108,11 @@ class COMCAST():
             if not auth_url:
                 xbmc.log(str(response))
                 # if still on login, do form based login
-                resp = opener.open(url, login_data) #url, login_data)
+                resp = opener.open(url, login_data, timeout=timeout) #url, login_data)
                 xbmc.log(str(resp.getcode()))
                 xbmc.log(str(resp.geturl()))
             time.sleep(1.5)
-            resp = opener.open(auth_url)
+            resp = opener.open(auth_url, timeout=timeout)
             xbmc.log(str(resp.getcode()))
             xbmc.log(str(resp.info()))
             response = resp.read()
