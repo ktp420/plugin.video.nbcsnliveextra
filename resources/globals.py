@@ -116,6 +116,8 @@ def GET_SIGNED_REQUESTOR_ID(requestor_id=None):
 
 def SET_STREAM_QUALITY(url):
     log(url)
+    if PLAY_MASTER == "true":
+        return url
     '''
     if QUALITY == 0:
         q_lvl = "200000"
@@ -315,6 +317,7 @@ CLEAR = str(settings.getSetting(id="clear_data"))
 FREE_ONLY = str(settings.getSetting(id="free_only"))
 PLAY_MAIN = str(settings.getSetting(id="play_main"))
 PLAY_BEST = str(settings.getSetting(id="play_best"))
+PLAY_MASTER = str(settings.getSetting(id="play_master"))
 
 if CLEAR == 'true':
    CLEAR_SAVED_DATA()
