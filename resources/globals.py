@@ -12,6 +12,7 @@ import base64
 from StringIO import StringIO
 import gzip
 from datetime import datetime, timedelta
+from urlparse import urljoin
 
 
 REQUESTOR_ID = 'nbcentertainment'
@@ -20,7 +21,7 @@ REQUESTORS = {
     'nbcentertainment': 'ksunsXjr6uB9EnT44k0MW02lL/VoFc/kBolROTzgHLR6gHB2NpgX9M0T31GDxO1OQEGi3+DAGuIMis3YrM+8uq5llSicSxQ3v1SNxOVAsqPrlzf9AfaNjLIbs15HDSZDWQ86hcvL4KeuPuHlF1gGI/M7l0AdcZsykh/geb0sfM0R7S0vyX06xjwapt00ajAu7h7WcI0vvTLDb6iZudjkisAX2EahlRINSSS44twK918QvVrci8pedF6utqLEi8VLcuwD/fnCAdLbPIkLQAedEvq1jmBYqKf1Tll3YiKtXLK7o1N6wymwhTFh95L+tZuOaDypMVGPKv1xYjJ+AT/Pzg==',
 }
 
-DISABLE_LOG=True
+DISABLE_LOG=False
 
 def log(*args):
     if DISABLE_LOG: return
@@ -114,7 +115,7 @@ def GET_SIGNED_REQUESTOR_ID(requestor_id=None):
     return REQUESTORS[requestor_id]
 
 def SET_STREAM_QUALITY(url):
-    xbmc.log(url)
+    log(url)
     '''
     if QUALITY == 0:
         q_lvl = "200000"
@@ -162,7 +163,7 @@ def SET_STREAM_QUALITY(url):
             cookies = cookies + "; "
         cookies = cookies + cookie.name + "=" + cookie.value
     
-    xbmc.log(master)
+    log(master)
     xbmc.log(cookies)
     line = re.compile("(.+?)\n").findall(master)  
     
@@ -172,20 +173,21 @@ def SET_STREAM_QUALITY(url):
     for temp_url in line:
         if '#EXT' not in temp_url:
             temp_url = temp_url.rstrip()
-            start = 0
-            if 'http' not in temp_url:
-                if 'master' in url:
-                    start = url.find('master')
-                elif 'manifest' in url:
-                    start = url.find('manifest')                
+            #start = 0
+            #if 'http' not in temp_url:
+            #    if 'master' in url:
+            #        start = url.find('master')
+            #    elif 'manifest' in url:
+            #        start = url.find('manifest')                
             
-            if url.find('?') != -1:
-                replace_url_chunk = url[start:url.find('?')]    
-            else:
-                replace_url_chunk = url[start:]    
+            #if url.find('?') != -1:
+            #    replace_url_chunk = url[start:url.find('?')]    
+            #else:
+            #    replace_url_chunk = url[start:]    
             
             
-            temp_url = url.replace(replace_url_chunk,temp_url)              
+            #temp_url = url.replace(replace_url_chunk,temp_url)              
+            temp_url = urljoin(url, temp_url)
             temp_url = temp_url.rstrip() + "|User-Agent=" + UA_NBCSN
             
             
@@ -340,11 +342,12 @@ REFERER = ''
 
 
 #User Agents
-UA_IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_2 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) Mobile/14A456'
+#UA_IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_0_2 like Mac OS X) AppleWebKit/602.1.50 (KHTML, like Gecko) Mobile/14A456'
+UA_IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_2_1 like Mac OS X) AppleWebKit/602.4.6 (KHTML, like Gecko) Mobile/14D27'
 UA_PC = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.81 Safari/537.36'
 UA_ADOBE_PASS = 'AdobePassNativeClient/1.10.1 (iPhone; U; CPU iPhone OS 10.0.2 like Mac OS X; en-us)'
-UA_NBCSN = 'AppleCoreMedia/1.0.0.14A456 (iPhone; U; CPU OS 10_0_2 like Mac OS X; en_us)'
-
+#UA_NBCSN = 'AppleCoreMedia/1.0.0.14A456 (iPhone; U; CPU OS 10_0_2 like Mac OS X; en_us)'
+UA_NBCSN = 'NBCSports_Prod/8616 CFNetwork/808.2.16 Darwin/16.3.0'
 
 #Create Random Device ID and save it to a file
 fname = os.path.join(ADDON_PATH_PROFILE, 'device.id')
