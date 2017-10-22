@@ -117,7 +117,7 @@ def GET_SIGNED_REQUESTOR_ID(requestor_id=None):
 def SET_STREAM_QUALITY(url):
     log(url)
     if PLAY_MASTER == "true":
-        return url
+        return url + "|User-Agent=" + UA_NBCSN
     '''
     if QUALITY == 0:
         q_lvl = "200000"
