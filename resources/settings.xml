@@ -18,6 +18,7 @@
     <setting id="cdn" type="enum" label="320" values="East|West" default="0" />	      
     <setting id="play_main" type="bool" label="230" default="true" />  
     <setting id="play_best" type="bool" label="240" default="true" />  
+    <setting id="bitrate_limit" type="number" label="260" default="10000" subsetting="true" visible="eq(-1,true)"/>
     <setting id="play_master" type="bool" label="250" default="true" />
   </category>
 </settings>

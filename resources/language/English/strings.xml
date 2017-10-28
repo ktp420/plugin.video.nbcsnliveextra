@@ -12,6 +12,7 @@
 	<string id="230">Play Stream From Main Window</string>	
 	<string id="240">Automatically Play Best Stream Available</string>	
 	<string id="250">Play the master manifest file</string>
+	<string id="260">Bit rate limit (e.x. 10000k)</string>
     <!-- Stream settings -->
     <string id="300">Stream</string>   
     <string id="310">Stream Quality</string>		

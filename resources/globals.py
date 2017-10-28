@@ -172,6 +172,8 @@ def SET_STREAM_QUALITY(url):
     xplayback = ''.join([random.choice('0123456789ABCDEF') for x in range(32)])
     xplayback = xplayback[0:7]+'-'+xplayback[8:12]+'-'+xplayback[13:17]+'-'+xplayback[18:22]+'-'+xplayback[23:]
 
+    _bitrate_limit = -1
+    stream_title_suffix = ' kbps'
     for temp_url in line:
         if '#EXT' not in temp_url:
             temp_url = temp_url.rstrip()
@@ -197,18 +199,22 @@ def SET_STREAM_QUALITY(url):
                 temp_url = temp_url + "&Cookie=" + cookies
             
             
-            stream_title.append(desc)
-            stream_url.update({desc:temp_url})
+            if bitrate > 0:
+                if BITRATE_LIMIT > 0 and bitrate < BITRATE_LIMIT:
+                    if _bitrate_limit < bitrate: 
+                        _bitrate_limit = bitrate
+                desc = str(bitrate) + stream_title_suffix
+                stream_title.append(desc)
+                stream_url.update({desc:temp_url})
         else:
-            desc = ''
+            bitrate = -1
             start = temp_url.find('BANDWIDTH=')
             if start > 0:
                 start = start + len('BANDWIDTH=')
                 end = temp_url.find(',',start)
                 desc = temp_url[start:end]
                 try:
-                    int(desc)
-                    desc = str(int(desc)/1000) + ' kbps'
+                    bitrate = int(desc)/1024
                 except:
                     pass            
     
@@ -219,19 +225,19 @@ def SET_STREAM_QUALITY(url):
         print "PLAY BEST SETTING"
         print PLAY_BEST
         if str(PLAY_BEST) == 'true':
-            ret = 0
-            try:
-                ret += 2 if stream_title[ret] == stream_title[ret+1] else 1
-            except:
-                pass
+            if _bitrate_limit > 0:
+                _title = str(_bitrate_limit) + stream_title_suffix
+            else:
+                _title = stream_title[0]
         else:
             dialog = xbmcgui.Dialog() 
             ret = dialog.select('Choose Stream Quality', stream_title)
             print ret
-        if ret >=0:
-            url = stream_url.get(stream_title[ret])           
-        else:
-            sys.exit()
+            if ret >=0:
+                _title = stream_title[ret]
+            else:
+                sys.exit()
+        url = stream_url.get(_title)
     else:
         msg = "No playable streams found."
         dialog = xbmcgui.Dialog() 
@@ -317,6 +323,7 @@ CLEAR = str(settings.getSetting(id="clear_data"))
 FREE_ONLY = str(settings.getSetting(id="free_only"))
 PLAY_MAIN = str(settings.getSetting(id="play_main"))
 PLAY_BEST = str(settings.getSetting(id="play_best"))
+BITRATE_LIMIT = int(settings.getSetting(id="bitrate_limit"))
 PLAY_MASTER = str(settings.getSetting(id="play_master"))
 
 if CLEAR == 'true':
